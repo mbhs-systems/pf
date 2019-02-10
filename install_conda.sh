@@ -35,6 +35,7 @@ BLAS="openblas"
 
 # Custom conda package installs here
 conda install -y jupyter
+conda install -y matplotlib
 
 # Check requirements
 if [ "${CONDA_DEFAULT_ENV}" != "base" ]
