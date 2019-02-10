@@ -6,7 +6,7 @@
 #############
 
 # Conda environment name
-CONDA_ENV="dedalus"
+CONDA_ENV="pf"
 
 # Skip conda prompts
 CONDA_YES=1
@@ -34,8 +34,7 @@ BLAS="openblas"
 ############
 
 # Custom conda package installs here
-conda install gxx_linux-64	# probably unnecessary
-conda install jupyter
+conda install -y jupyter
 
 # Check requirements
 if [ "${CONDA_DEFAULT_ENV}" != "base" ]
@@ -156,8 +155,8 @@ esac
 
 # Install MPI the normal way; ${CARGS{@}} seems to fuck it up
 # so just make sure you grab it from the correct channel
-conda install -c conda-forge openmpi
-conda install -c conda-forge mpi4py
+conda install -c conda-forge -y openmpi
+conda install -c conda-forge -y mpi4py
 
 if [ ${INSTALL_FFTW} -eq 1 ]
 then
