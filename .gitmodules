@@ -1,0 +1,3 @@
+[submodule "dedaLES"]
+	path = dedaLES
+	url = git@github.com:glwagner/dedaLES.git
