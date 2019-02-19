@@ -36,6 +36,7 @@ BLAS="openblas"
 # Custom conda package installs here
 conda install -y jupyter
 conda install -y matplotlib
+conda install -c conda-forge nb_conda_kernels
 
 # Check requirements
 if [ "${CONDA_DEFAULT_ENV}" != "base" ]
