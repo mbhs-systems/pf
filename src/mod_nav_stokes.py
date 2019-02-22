@@ -37,6 +37,8 @@ class NavierStokesTriplyPeriodicFlow(Flow):
 		:param closure: (None or closure.EddyViscosityClosure) Turbulent closure for Large Eddy Simulation
 		:param params: Additional parameters to be added to the dedalus problem.
 		'''
+		# TODO separate linear and background terms?
+
 		Flow.__init__(self, nx, ny, nz, Lx, Ly, Lz)
 
 		# Set up boundaries
@@ -75,27 +77,29 @@ class NavierStokesTriplyPeriodicFlow(Flow):
 		problem.substitutions['b'] = '1.0'
 		problem.substitutions['m'] = '1.0'
 
-		# TODO separate linear and background terms
-
 		# Add momentum equations
-		matder_x = 'b * (u * ux + v * uy + w * uz + dt(u))'  # material derivative terms
-		matder_y = 'b * (u * vx + v * vy + w * vz + dt(v))'
-		matder_z = 'b * (u * wx + v * wy + w * wz + dt(w))'
 		lapterm_x = 'm * (uxx + uyy + uzz)'  # laplacian terms
 		lapterm_y = 'm * (vxx + vyy + vzz)'
 		lapterm_z = 'm * (wxx + wyy + wzz)'
 		graddiv_x = '1.0/3.0 * m * (uxx + vxy + wxz)'  # grad div terms
 		graddiv_y = '1.0/3.0 * m * (uxy + vyy + wyz)'
 		graddiv_z = '1.0/3.0 * m * (uxz + vyz + wzz)'
-		mom_x = f'{matder_x} = -px + {lapterm_x} + {graddiv_x}'  # final momentum terms
-		mom_y = f'{matder_y} = -py + {lapterm_y} + {graddiv_y}'
-		mom_z = f'{matder_z} = -pz + {lapterm_z} + {graddiv_z}'
+		dotdel_x = 'b * (u * ux + v * uy + w * uz)'
+		dotdel_y = 'b * (u * vx + v * vy + w * vz)'
+		dotdel_z = 'b * (u * wx + v * wy + w * wz)'
+		mom_x = f'b * dt(u) + px = {lapterm_x} + {graddiv_x} - {dotdel_x}'  # final momentum terms
+		mom_y = f'b * dt(u) + px = {lapterm_y} + {graddiv_y} - {dotdel_y}'
+		mom_z = f'b * dt(u) + px = {lapterm_z} + {graddiv_z} - {dotdel_z}'
+
 		problem.add_equation(mom_x)  # add the equations to the solver
 		problem.add_equation(mom_y)
 		problem.add_equation(mom_z)
 
 		# Continuity equation
 		problem.add_equation("p = 0", condition="(nx == 0) and (ny == 0) and (nz == 0)")
+
+		print('Equations:')
+		print(problem.equations)
 
 	def build_solver(self, timestepper='RK443'):
 		'''
