@@ -1,4 +1,5 @@
-import sys; sys.path.append("..")
+import sys;
+sys.path.append("./dedaLES")
 
 import numpy as np
 import logging
@@ -8,8 +9,8 @@ from numpy import pi
 from dedalus.extras.plot_tools import plot_bot_3d
 from dedalus.extras import flow_tools
 
-from dedaLES import dedaLES as dedaLES
-#import mpiprint
+import dedaLES
+import mod_nav_stokes as mns
 
 import matplotlib.pyplot as plt
 
@@ -19,11 +20,11 @@ startt = time.time()
 logger = logging.getLogger(__name__)
 
 def log_magnitude(xmesh, ymesh, data):
-	'''
-	Log magnitude function for scaling a magnitude for plotting
-	complex valueds scalar fields
-	'''
-	return xmesh, ymesh, np.log10(np.abs(data))
+        '''
+        Log magnitude function for scaling a magnitude for plotting
+        complex valueds scalar fields
+        '''
+        return xmesh, ymesh, np.log10(np.abs(data))
 
 # Parameters
 nx = ny = nz = 64
@@ -31,8 +32,7 @@ Lx = Ly = Lz = 2*pi
 
 # Homoegneous Navier-Stokes equations
 closure = None
-model = dedaLES.NavierStokesTriplyPeriodicFlow(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz,
-												ν=1.0, closure=closure)
+model = mns.NavierStokesTriplyPeriodicFlow(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, ν=1.0, closure=closure)
 model.build_solver()
 
 # Random initial condition. Re_k = u k / ν => u ~ ν * Re_k / k
@@ -77,7 +77,7 @@ startt = time.time()
 
 # Run the simulation, plot the pressure field occasionally
 while model.solver.ok:
-	model.solver.step(dt)
+        model.solver.step(dt)
 
 #plot_bot_3d(model.solver.state['p'], 1, 1, func=log_magnitude)
 #plt.savefig('img/dns_' + str(model.solver.iteration / 10) + '.png')
