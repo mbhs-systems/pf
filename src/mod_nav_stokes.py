@@ -1,15 +1,15 @@
 import sys;
 
-sys.path.append('./dedaLES')
+sys.path.append('../dedaLES')
 
 import numpy as np
 
 from numpy import pi
 from dedalus import public as de
 
-from dedaLES.flows import Flow
-from dedaLES.utils import add_parameters, bind_parameters, add_first_derivative_substitutions
-from dedaLES.closures import add_closure_substitutions, add_closure_variables, add_closure_equations
+from dedaLES.dedaLES.flows import Flow
+from dedaLES.dedaLES.utils import add_parameters, bind_parameters, add_first_derivative_substitutions
+from dedaLES.dedaLES.closures import add_closure_substitutions, add_closure_variables, add_closure_equations
 
 
 class NavierStokesTriplyPeriodicFlow(Flow):
