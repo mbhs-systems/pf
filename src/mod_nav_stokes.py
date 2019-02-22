@@ -78,24 +78,25 @@ class NavierStokesTriplyPeriodicFlow(Flow):
 		problem.substitutions['m'] = '1.0'
 
 		# Add momentum equations
-		lapterm_x = 'm * (uxx + uyy + uzz)'  # laplacian terms
-		lapterm_y = 'm * (vxx + vyy + vzz)'
-		lapterm_z = 'm * (wxx + wyy + wzz)'
-		graddiv_x = '1.0/3.0 * m * (uxx + vxy + wxz)'  # grad div terms
-		graddiv_y = '1.0/3.0 * m * (uxy + vyy + wyz)'
-		graddiv_z = '1.0/3.0 * m * (uxz + vyz + wzz)'
-		dotdel_x = 'b * (u * ux + v * uy + w * uz)'
-		dotdel_y = 'b * (u * vx + v * vy + w * vz)'
-		dotdel_z = 'b * (u * wx + v * wy + w * wz)'
-		mom_x = f'b * dt(u) + px = {lapterm_x} + {graddiv_x} - {dotdel_x}'  # final momentum terms
-		mom_y = f'b * dt(u) + px = {lapterm_y} + {graddiv_y} - {dotdel_y}'
-		mom_z = f'b * dt(u) + px = {lapterm_z} + {graddiv_z} - {dotdel_z}'
+		lapterm_x = 'm * (dx(dx(u)) + dy(dy(u)) + dz(dz(u)))'  # \mu \nabla^2 \mathbf{u} terms
+		lapterm_y = 'm * (dx(dx(v)) + dy(dy(v)) + dz(dz(v)))'
+		lapterm_z = 'm * (dx(dx(w)) + dy(dy(w)) + dz(dz(w)))'
+		graddiv_x = '1.0/3.0 * m * (dx(dx(u)) + dx(dy(v)) + dx(dz(w)))'  # \frac{\mu}{3} \nabla \nabla \cdot \mathbf{u} terms
+		graddiv_y = '1.0/3.0 * m * (dx(dy(u)) + dy(dy(v)) + dy(dz(w)))'
+		graddiv_z = '1.0/3.0 * m * (dx(dz(u)) + dy(dz(v)) + dz(dz(w)))'
+		dotdel_x = 'b * (u * dx(u) + v * dy(u) + w * dz(u))'    # \rho \mathbf{u} \cdot \nabla \mathbf{u} terms
+		dotdel_y = 'b * (u * dx(v) + v * dy(v) + w * dz(v))'
+		dotdel_z = 'b * (u * dx(w) + v * dy(w) + w * dz(w))'
+		mom_x = f'b * dt(u) + dx(p) = {lapterm_x} + {graddiv_x} - {dotdel_x}'  # final momentum equations
+		mom_y = f'b * dt(u) + dy(p) = {lapterm_y} + {graddiv_y} - {dotdel_y}'
+		mom_z = f'b * dt(u) + dz(p) = {lapterm_z} + {graddiv_z} - {dotdel_z}'
 
 		problem.add_equation(mom_x)  # add the equations to the solver
 		problem.add_equation(mom_y)
 		problem.add_equation(mom_z)
 
 		# Continuity equation
+		problem.add_equation("ux + vy + wz = 0", condition="(nx != 0) or (ny != 0) or (nz != 0)")
 		problem.add_equation("p = 0", condition="(nx == 0) and (ny == 0) and (nz == 0)")
 
 		print('Equations:')

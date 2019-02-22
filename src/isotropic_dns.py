@@ -8,7 +8,7 @@ import numpy as np
 from numpy import pi
 
 from dedalus.extras import flow_tools
-import dedaLES
+from dedaLES import dedaLES
 
 import mod_nav_stokes as mns
 
@@ -25,7 +25,7 @@ def log_magnitude(xmesh, ymesh, data):
 
 
 # Parameters
-nx = ny = nz = 64
+nx = ny = nz = 4
 Lx = Ly = Lz = 2 * pi
 
 # Homoegneous Navier-Stokes equations
