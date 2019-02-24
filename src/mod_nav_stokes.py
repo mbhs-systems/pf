@@ -105,8 +105,8 @@ class NavierStokesTriplyPeriodicFlow(Flow):
 		dotdel_z = 'b * (u * wx + v * wy + w * wz)'
 
 		mom_x = f'b * dt(u) + dx(p) = {lapterm_x} + {graddiv_x} - {dotdel_x}'
-		mom_y = f'b * dt(u) + dy(p) = {lapterm_y} + {graddiv_y} - {dotdel_y}'
-		mom_z = f'b * dt(u) + dz(p) = {lapterm_z} + {graddiv_z} - {dotdel_z}'
+		mom_y = f'b * dt(v) + dy(p) = {lapterm_y} + {graddiv_y} - {dotdel_y}'
+		mom_z = f'b * dt(w) + dz(p) = {lapterm_z} + {graddiv_z} - {dotdel_z}'
 
 		problem.add_equation(mom_x)
 		problem.add_equation(mom_y)
