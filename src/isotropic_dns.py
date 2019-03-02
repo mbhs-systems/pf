@@ -25,7 +25,11 @@ def log_magnitude(xmesh, ymesh, data):
 
 
 # Parameters
-nx = ny = nz = 8
+if len(sys.argv) > 1:
+	rep = np.power(2,int(sys.argv[1]))
+else:
+	rep = 8
+nx = ny = nz = rep
 Lx = Ly = Lz = 2 * pi
 
 # Homoegneous Navier-Stokes equations
