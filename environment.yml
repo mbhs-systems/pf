@@ -1,0 +1,20 @@
+name: pf
+channels:
+    - conda-forge
+    - cryoem
+dependencies:
+    - python=3.6
+    - conda-forge::setuptools
+    - conda-forge::cython
+    - conda-forge::numpy=*=*openblas*
+    - conda-forge::scipy=*=*openblas*
+    - conda-forge::openmpi
+    - conda-forge::mpi4py
+    - cryoem::fftw-mpi [--no-deps]
+    - conda-forge:: hdf5
+    - conda-forge:: h5py
+    - conda-forge::docopt
+    - conda-forge::matplotlib
+    - conda-forge::pip
+    - pip:
+        - dedalus [--no-cache, --pre]
