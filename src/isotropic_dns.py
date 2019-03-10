@@ -10,7 +10,8 @@ from numpy import pi
 from dedalus.extras import flow_tools
 import dedaLES
 
-import mod_nav_stokes as mns
+# import mod_nav_stokes as mns
+import channel_mod
 
 startt = time.time()
 logger = logging.getLogger(__name__)
@@ -34,7 +35,9 @@ Lx = Ly = Lz = 2 * pi
 
 # Homoegneous Navier-Stokes equations
 closure = None
-model = mns.NavierStokesTriplyPeriodicFlow(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, ν=1.0, closure=closure)
+# model = mns.NavierStokesTriplyPeriodicFlow(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, ν=1.0, closure=closure)
+model = channel_mod.ChannelMod_DNS(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, xleft=nx, yleft=ny, zbottom=nz,
+								   nu=1.0, rho=1.0)
 model.build_solver()
 
 # Random initial condition. Re_k = u k / ν => u ~ ν * Re_k / k
@@ -64,14 +67,14 @@ max_u = np.max(model.u['g'])
 dt = 0.1 * 2 * pi / (max_u * nx)  # grid-scale turbulence time-scale = 1/(u*k)
 cadence = 10
 
-flow = flow_tools.GlobalFlowProperty(model.solver, cadence=cadence)
-flow.add_property("sqrt(u*u + v*v + w*w) / ν", name='Re')
+# flow = flow_tools.GlobalFlowProperty(model.solver, cadence=cadence)
+# flow.add_property("sqrt(u*u + v*v + w*w) / ν", name='Re')
 
 
-def average_Re(model): return flow.volume_average('Re')
+# def average_Re(model): return flow.volume_average('Re')
 
 
-def max_Re(model): return flow.max('Re')
+# def max_Re(model): return flow.max('Re')
 
 
 # model.add_log_tasks(avg_Re=average_Re, max_Re=max_Re)
