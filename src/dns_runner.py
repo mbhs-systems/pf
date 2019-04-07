@@ -92,3 +92,7 @@ while model.solver.ok:
 # plot_bot_3d(model.solver.state['p'], 1, 1, func=log_magnitude)
 # plt.savefig('img/dns_' + str(model.solver.iteration / 10) + '.png')
 print('Elapsed time: ' + str((time.time() - startt)))
+
+from src.les_model import filter_field
+print('\n\n\n\n\n')
+filter_field(model.u)

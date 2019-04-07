@@ -8,29 +8,70 @@ import numpy as np
 from numpy import pi
 
 from dedalus.extras import flow_tools
+from dedalus.extras import plot_tools
+
 import dedaLES
 
-
 import src.dns_model as dns
-# import channel_mod
+
+
+def fourier_filter(k, length_scale):
+    '''
+    Evaluate a Gaussian LES filter for a "wavenumber" input vector k
+
+    :param k: input vector of spatial wave numbers
+    :param length_scale: length scale (\Delta)
+    :return: filter output
+    '''
+    return np.exp(-np.power(2, k) * np.power(2, length_scale) / 24)
+
+
+def filter_field(field, length_scale):
+    '''Bandpass FFT filter of the form <0, 0, ....., 0, 1, 1, ...., 1, 0, 0, ....>'''
+
+    # spec = np.fft.fftn(field['g'])
+    spec = field['c']
+    xfb = np.linspace(0, 1, field['c'].shape[0])
+    yfb = np.linspace(0, 1, field['c'].shape[1])
+    zfb = np.linspace(0, 1, field['c'].shape[2])
+    fgrid = np.meshgrid(xfb, yfb, zfb)
+    print('Shape: ' + str(type(fgrid)))
+    filt = fourier_filter(fgrid, length_scale)
+    field['c'] *= filt
+
+    # dom = field.domain
+    # slice = dom.dist.coeff_layout.slices(scales=dom.dealias)
+    # coeff = []
+    #
+    # for i in range(dom.dim)[::-1]:
+    #     coeff.append(np.linspace(0, 1, dom.global_coeff_shape[i], endpoint=False))
+    # cc = np.meshgrid(*coeff)
+    #
+    # field_filter = np.zeros(dom.local_coeff_shape, dtype='bool')
+    # # for i in range(dom.dim):
+    # #     field_filter = field_filter | (cc[i][slice])
+    #
+    # print('Type: ' + str(type(field['g'])) + '\n')
+    # print('Shape: ' + str(field['g'].shape))
+
 
 startt = time.time()
 logger = logging.getLogger(__name__)
 
 
 def log_magnitude(xmesh, ymesh, data):
-	'''
-	Log magnitude function for scaling a magnitude for plotting
-	complex valueds scalar fields
-	'''
-	return xmesh, ymesh, np.log10(np.abs(data))
+    '''
+    Log magnitude function for scaling a magnitude for plotting
+    complex valueds scalar fields
+    '''
+    return xmesh, ymesh, np.log10(np.abs(data))
 
 
 # Parameters
 if len(sys.argv) > 1:
-	rep = np.power(2,int(sys.argv[1]))
+    rep = np.power(2, int(sys.argv[1]))
 else:
-	rep = 8
+    rep = 8
 nx = ny = nz = rep
 Lx = Ly = Lz = 2 * pi
 
@@ -87,7 +128,11 @@ startt = time.time()
 
 # Run the simulation, plot the pressure field occasionally
 while model.solver.ok:
-	model.solver.step(dt)
+    model.solver.step(dt)
+    filter_field(model.u, 1)
+    filter_field(model.v, 1)
+    filter_field(model.w, 1)
+    filter_field(model.p, 1)
 
 # plot_bot_3d(model.solver.state['p'], 1, 1, func=log_magnitude)
 # plt.savefig('img/dns_' + str(model.solver.iteration / 10) + '.png')
