@@ -117,6 +117,27 @@ class LES_3P_Box(Flow):
 		problem.add_equation('p = 0', condition='(nx == 0) and (ny == 0) and (nz == 0)')
 
 
+		######################################## BEGIN CONSTRUCTION ZONE#############################################
+		#problem.parameters['mu'] =
+
+
+		for i in range(3):
+			for j in range(3):
+				#problem.substitutions[f's{i}{j}']
+
+		#problem.substitutions['nu_t'] = wtf???
+
+		for i in range(3):
+			for j in range(3):
+				problem.substitutions['taur{i}{j}'] = "2 * sij * (mu/3 - nu_t)"
+
+
+		for i in range(3):
+
+			for j in range(3):
+
+	######################################## END CONSTRUCTION ZONE#############################################
+
 	def build_solver(self, timestepper='RK443'):
 		'''
 		Build a NavierStokesTriplyPeriodicFlow solver.
