@@ -15,7 +15,7 @@ from dedaLES.closures import add_closure_substitutions, add_closure_variables, a
 #from dedaLES.dedaLES.utils import add_parameters, bind_parameters, add_first_derivative_substitutions
 #from dedaLES.dedaLES.closures import add_closure_substitutions, add_closure_variables, add_closure_equations
 
-class NavierStokesTriplyPeriodicFlow(ChannelFlow):
+class DNS_3P_Box(Flow):
 	'''
 	Flow in a triply-periodic box with optional rotation.
 	'''
@@ -42,12 +42,12 @@ class NavierStokesTriplyPeriodicFlow(ChannelFlow):
 		'''
 		# TODO separate linear and background terms?
 
-		ChannelFlow.__init__(self, nx, ny, nz, Lx, Ly, Lz, None, None, None)
+		Flow.__init__(self, nx, ny, nz, Lx, Ly, Lz)
 
 		# Set up boundaries
-		# self.xlimits = (-Lx / 2, Lx / 2)
-		# self.ylimits = (-Ly / 2, Ly / 2)
-		# self.zlimits = (-Lz / 2, Lz / 2)
+		self.xlimits = (-Lx / 2, Lx / 2)
+		self.ylimits = (-Ly / 2, Ly / 2)
+		self.zlimits = (-Lz / 2, Lz / 2)
 
 		# Create bases and domain
 		self.xbasis = xbasis = de.Fourier('x', nx, interval=self.xlimits, dealias=3 / 2)
@@ -57,10 +57,6 @@ class NavierStokesTriplyPeriodicFlow(ChannelFlow):
 		self.x = domain.grid(0)
 		self.y = domain.grid(1)
 		self.z = domain.grid(2)
-
-		self.set_nppenetration_bc_top()
-		self.set_nppenetration_bc_bottom()
-		self.set_nppenetration_bc_bottom()
 
 		bind_parameters(self, ν=ν, **params)
 

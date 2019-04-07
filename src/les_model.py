@@ -15,7 +15,7 @@ from dedaLES.closures import add_closure_substitutions, add_closure_variables, a
 #from dedaLES.dedaLES.utils import add_parameters, bind_parameters, add_first_derivative_substitutions
 #from dedaLES.dedaLES.closures import add_closure_substitutions, add_closure_variables, add_closure_equations
 
-class NavierStokesTriplyPeriodicFlow(Flow):
+class LES_3P_Box(Flow):
 	'''
 	Flow in a triply-periodic box with optional rotation.
 	'''

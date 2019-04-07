@@ -10,8 +10,9 @@ from numpy import pi
 from dedalus.extras import flow_tools
 import dedaLES
 
-# import mod_nav_stokes as mns
-import channel_mod
+
+import src.dns_model as dns
+# import channel_mod
 
 startt = time.time()
 logger = logging.getLogger(__name__)
@@ -35,9 +36,9 @@ Lx = Ly = Lz = 2 * pi
 
 # Homoegneous Navier-Stokes equations
 closure = None
-# model = mns.NavierStokesTriplyPeriodicFlow(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, ν=1.0, closure=closure)
-model = channel_mod.ChannelMod_DNS(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, xleft=nx, yleft=ny, zbottom=nz,
-								   nu=1.0, rho=1.0)
+model = dns.DNS_3P_Box(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, ν=1.0, closure=closure)
+# model = channel_mod.ChannelMod_DNS(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, xleft=nx, yleft=ny, zbottom=nz,
+# 								   nu=1.0, rho=1.0)
 model.build_solver()
 
 # Random initial condition. Re_k = u k / ν => u ~ ν * Re_k / k
