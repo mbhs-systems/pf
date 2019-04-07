@@ -15,7 +15,8 @@ class ChannelMod(ChannelFlow):
 
         self.xbasis = xbasis = de.Fourier('x', nx, interval=self.xlimits, dealias=3/2)
         self.ybasis = ybasis = de.Fourier('y', ny, interval=self.ylimits, dealias=3/2)
-        self.zbasis = zbasis = de.Fourier('z', nz, interval=self.zlimits, dealias=3/2)
+        # self.zbasis = zbasis = de.Fourier('z', nz, interval=self.zlimits, dealias=3/2)
+        self.zbasis = zbasis = de.Chebyshev('z', nz, interval=self.zlimits, dealias=3/2)
         self.domain = domain = de.Domain([xbasis, ybasis, zbasis], grid_dtype=np.float64)
 
         # Add variables (u, v, w components of the flow field, their first x,y,z partials, and the pressure field p)
@@ -49,13 +50,19 @@ class ChannelMod(ChannelFlow):
         for i in range(3):
             icoord = ['x', 'y', 'z'][i]
             icomp = ['u', 'v', 'w'][i]
-            eqstr = f'dt({icomp}) - d{icoord}(p) = {nla[i]} + {st[i]}'
+            eqstr = f'dt({icomp}) + d{icoord}(p) = -{nla[i]} + {st[i]}'
             print(eqstr)
             self.problem.add_equation(eqstr)
 
+        # Add boundary conditions equivalent to boussinesq impl
+        self.problem.add_equation('ux + vy + wz = 0', condition='(nx != 0) or (ny != 0)')
+        self.problem.add_equation('p = 0', condition='(nx == 0) and (ny == 0)')
+        # self.problem.add_equation('ux + vy + wz = 0')
+        # self.problem.add_bc('right(p) = 0', condition='(nx == 0) and (ny == 0)')
+
         # Add continuity equations
-        self.problem.add_equation('ux + vy + wz = 0', condition='(nx != 0) or (ny != 0) or (nz != 0)')
-        self.problem.add_equation('p = 0', condition='(nx == 0) and (ny == 0) and (nz == 0)')
+        # self.problem.add_equation('ux + vy + wz = 0', condition='(nx != 0) or (ny != 0) or (nz != 0)')
+        # self.problem.add_equation('p = 0', condition='(nx == 0) and (ny == 0) and (nz == 0)')
 
 
     def _add_substitutions(self, **substitutions):

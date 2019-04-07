@@ -18,18 +18,18 @@ logger = logging.getLogger(__name__)
 
 
 def log_magnitude(xmesh, ymesh, data):
-	'''
-	Log magnitude function for scaling a magnitude for plotting
-	complex valueds scalar fields
-	'''
-	return xmesh, ymesh, np.log10(np.abs(data))
+    '''
+    Log magnitude function for scaling a magnitude for plotting
+    complex valueds scalar fields
+    '''
+    return xmesh, ymesh, np.log10(np.abs(data))
 
 
 # Parameters
 if len(sys.argv) > 1:
-	rep = np.power(2,int(sys.argv[1]))
+    rep = np.power(2, int(sys.argv[1]))
 else:
-	rep = 8
+    rep = 8
 nx = ny = nz = rep
 Lx = Ly = Lz = 2 * pi
 
@@ -37,7 +37,19 @@ Lx = Ly = Lz = 2 * pi
 closure = None
 # model = mns.NavierStokesTriplyPeriodicFlow(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, ν=1.0, closure=closure)
 model = channel_mod.ChannelMod_DNS(nx=nx, ny=ny, nz=nz, Lx=Lx, Ly=Ly, Lz=Lz, xleft=nx, yleft=ny, zbottom=nz,
-								   nu=1.0, rho=1.0)
+                                   nu=1.0, rho=1.0)
+print('Number of Eqs:')
+print(model.problem.equations)
+
+# Add boundary conditions equivalent to boussinesq example
+model.set_bc("nopenetration", "top", "bottom")
+model.set_bc("freeslip", "top", "bottom")
+# model.problem.add_bc("right(b) = 0")
+# model.problem.add_bc("left(b) = Δb")
+
+# print('Number of Eqs:')
+# print(len(model.problem.equations))
+
 model.build_solver()
 
 # Random initial condition. Re_k = u k / ν => u ~ ν * Re_k / k
@@ -65,19 +77,6 @@ wz.integrate('z', out=model.w)
 # Run the simulation
 max_u = np.max(model.u['g'])
 dt = 0.1 * 2 * pi / (max_u * nx)  # grid-scale turbulence time-scale = 1/(u*k)
-cadence = 10
-
-# flow = flow_tools.GlobalFlowProperty(model.solver, cadence=cadence)
-# flow.add_property("sqrt(u*u + v*v + w*w) / ν", name='Re')
-
-
-# def average_Re(model): return flow.volume_average('Re')
-
-
-# def max_Re(model): return flow.max('Re')
-
-
-# model.add_log_tasks(avg_Re=average_Re, max_Re=max_Re)
 model.stop_at(sim_time=np.inf, wall_time=np.inf, iteration=100)
 
 print('Elapsed time: ' + str((time.time() - startt)))
@@ -86,8 +85,5 @@ startt = time.time()
 
 # Run the simulation, plot the pressure field occasionally
 while model.solver.ok:
-	model.solver.step(dt)
-
-# plot_bot_3d(model.solver.state['p'], 1, 1, func=log_magnitude)
-# plt.savefig('img/dns_' + str(model.solver.iteration / 10) + '.png')
+    model.solver.step(dt)
 print('Elapsed time: ' + str((time.time() - startt)))
